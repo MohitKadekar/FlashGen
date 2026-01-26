@@ -59,6 +59,10 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/test")
+async def test():
+    return {"status": "Running"}
+
 @app.get("/api/random-quote")
 async def get_random_quote():
     """
