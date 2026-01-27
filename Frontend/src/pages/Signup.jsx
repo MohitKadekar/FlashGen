@@ -1,25 +1,10 @@
-import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import React from 'react';
 import Navbar from '../components/Navbar';
-import Hero from '../components/Hero';
-import Features from '../components/Features';
 import Footer from '../components/Footer';
+import SignupForm from '../components/SignupForm';
 import FloatingLines from '../components/FloatingLines';
 
-const Landing = () => {
-    const { hash } = useLocation();
-
-    useEffect(() => {
-        if (hash) {
-            const element = document.getElementById(hash.replace('#', ''));
-            if (element) {
-                setTimeout(() => {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                }, 100);
-            }
-        }
-    }, [hash]);
-
+const Signup = () => {
     return (
         <div className="flex flex-col min-h-screen bg-black relative">
             <div className="fixed inset-0 z-0 pointer-events-none">
@@ -33,16 +18,18 @@ const Landing = () => {
                     parallax={true}
                 />
             </div>
+
             <div className="relative z-10 flex flex-col min-h-screen">
                 <Navbar />
-                <main className="flex-grow">
-                    <Hero />
-                    <Features />
+
+                <main className="flex-grow flex items-center justify-center px-4 pt-32 pb-20 sm:px-6 lg:px-8">
+                    <SignupForm />
                 </main>
+
                 <Footer />
             </div>
         </div>
     );
 };
 
-export default Landing;
+export default Signup;
