@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Footer = () => {
     return (
-        <footer className="bg-gray-900 border-t border-gray-800">
+        <footer className="bg-black/20 backdrop-blur-lg border-t border-white/10">
             <div className="mx-auto w-full px-6 lg:px-12 p-4 py-6 lg:py-8">
                 <div className="md:flex md:justify-between">
                     <div className="mb-6 md:mb-0">
@@ -21,10 +21,10 @@ const Footer = () => {
                             <h2 className="mb-6 text-sm font-semibold text-white uppercase">Resources</h2>
                             <ul className="text-gray-400 font-medium">
                                 <li className="mb-4">
-                                    <a href="#" className="hover:underline hover:text-white">Home</a>
+                                    <Link to="/" className="hover:underline hover:text-white">Home</Link>
                                 </li>
                                 <li>
-                                    <a href="#features" className="hover:underline hover:text-white">Features</a>
+                                    <Link to="/#features" className="hover:underline hover:text-white">Features</Link>
                                 </li>
                             </ul>
                         </div>
@@ -32,10 +32,10 @@ const Footer = () => {
                             <h2 className="mb-6 text-sm font-semibold text-white uppercase">Follow us</h2>
                             <ul className="text-gray-400 font-medium">
                                 <li className="mb-4">
-                                    <a href="#" className="hover:underline hover:text-white">Github</a>
+                                    <Link to="/" className="hover:underline hover:text-white">Github</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="hover:underline hover:text-white">Discord</a>
+                                    <Link to="/" className="hover:underline hover:text-white">Discord</Link>
                                 </li>
                             </ul>
                         </div>
@@ -43,10 +43,10 @@ const Footer = () => {
                             <h2 className="mb-6 text-sm font-semibold text-white uppercase">Legal</h2>
                             <ul className="text-gray-400 font-medium">
                                 <li className="mb-4">
-                                    <a href="#" className="hover:underline hover:text-white">Privacy Policy</a>
+                                    <Link to="/" className="hover:underline hover:text-white">Privacy Policy</Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="hover:underline hover:text-white">Terms &amp; Conditions</a>
+                                    <Link to="/" className="hover:underline hover:text-white">Terms &amp; Conditions</Link>
                                 </li>
                             </ul>
                         </div>
