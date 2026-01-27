@@ -1,47 +1,16 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { Link } from 'react-router-dom';
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 
 const SignupForm = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [formData, setFormData] = useState({
-        email: '',
-        password: ''
-    });
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-        setError(''); // Clear error when user types
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setError('');
-
-        try {
-            await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-            navigate('/login'); // Redirect to login page on success
-        } catch (err) {
-            console.error(err);
-            if (err.code === 'auth/email-already-in-use') {
-                setError('Email is already in use.');
-            } else if (err.code === 'auth/weak-password') {
-                setError('Password should be at least 6 characters.');
-            } else if (err.code === 'auth/invalid-email') {
-                setError('Invalid email address.');
-            } else {
-                setError('Failed to create account. Please try again.');
-            }
-        } finally {
-            setIsLoading(false);
-        }
+        setTimeout(() => setIsLoading(false), 2000);
     };
 
     return (
@@ -50,13 +19,6 @@ const SignupForm = () => {
                 <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
                 <p className="text-gray-400">Join FlashGen today to master your studies</p>
             </div>
-
-            {error && (
-                <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3">
-                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-                    <p className="text-sm text-red-400">{error}</p>
-                </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
@@ -73,8 +35,6 @@ const SignupForm = () => {
                             type="email"
                             autoComplete="email"
                             required
-                            value={formData.email}
-                            onChange={handleChange}
                             className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-500 transition-all duration-200 hover:bg-white/10"
                             placeholder="you@example.com"
                         />
@@ -96,8 +56,6 @@ const SignupForm = () => {
                             autoComplete="new-password"
                             required
                             minLength={6}
-                            value={formData.password}
-                            onChange={handleChange}
                             className="block w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-500 transition-all duration-200 hover:bg-white/10"
                             placeholder="••••••••"
                         />
