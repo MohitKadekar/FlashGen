@@ -1,16 +1,53 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Mail, Lock, ArrowRight, Loader2, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const LoginForm = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = (e) => {
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setError('');
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        setTimeout(() => setIsLoading(false), 2000);
+        setError('');
+
+        try {
+            await signInWithEmailAndPassword(auth, formData.email, formData.password);
+            // Redirect to dashboard or home page on success
+            // For now, redirecting to home as dashboard isn't specified in routes yet
+            navigate('/');
+        } catch (err) {
+            console.error(err);
+            if (err.code === 'auth/invalid-credential') {
+                setError('Invalid email or password.');
+            } else if (err.code === 'auth/user-not-found') {
+                setError('No account found with this email.');
+            } else if (err.code === 'auth/wrong-password') {
+                setError('Incorrect password.');
+            } else if (err.code === 'auth/invalid-email') {
+                setError('Invalid email address.');
+            } else if (err.code === 'auth/network-request-failed') {
+                setError('Network error. Please check your internet connection.');
+            } else {
+                setError('Failed to log in. Please try again.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -19,6 +56,13 @@ const LoginForm = () => {
                 <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
                 <p className="text-gray-400">Log in to continue your learning journey</p>
             </div>
+
+            {error && (
+                <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                    <p className="text-sm text-red-400">{error}</p>
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
@@ -35,6 +79,8 @@ const LoginForm = () => {
                             type="email"
                             autoComplete="email"
                             required
+                            value={formData.email}
+                            onChange={handleChange}
                             className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-500 transition-all duration-200 hover:bg-white/10"
                             placeholder="you@example.com"
                         />
@@ -55,6 +101,8 @@ const LoginForm = () => {
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
                             required
+                            value={formData.password}
+                            onChange={handleChange}
                             className="block w-full pl-10 pr-10 py-3 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-white placeholder-gray-500 transition-all duration-200 hover:bg-white/10"
                             placeholder="••••••••"
                         />
