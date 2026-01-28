@@ -29,7 +29,7 @@ const LoginForm = () => {
             await signInWithEmailAndPassword(auth, formData.email, formData.password);
             // Redirect to dashboard or home page on success
             // For now, redirecting to home as dashboard isn't specified in routes yet
-            navigate('/');
+            navigate('/dashboard');
         } catch (err) {
             console.error(err);
             if (err.code === 'auth/invalid-credential') {
