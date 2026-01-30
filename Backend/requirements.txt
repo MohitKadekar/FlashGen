@@ -2,3 +2,5 @@ fastapi
 uvicorn
 google-generativeai
 python-dotenv
+firebase-admin
+python-multipart
