@@ -12,10 +12,7 @@ const FlashcardsPage = () => {
     const [error, setError] = useState(null);
 
     const handleSearch = useCallback(async (query) => {
-        if (!query.trim()) {
-            setFlashcards([]);
-            return;
-        }
+        // If query is empty, allow it to pass through to fetch all cards
 
         setLoading(true);
         setError(null);

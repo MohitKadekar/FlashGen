@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import FlashcardsPage from './pages/FlashcardsPage';
+import FlashcardDetailPage from './pages/FlashcardDetailPage';
 
 function App() {
   return (
@@ -35,6 +36,14 @@ function App() {
         element={
           <ProtectedRoute>
             <FlashcardsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/flashcards/:id"
+        element={
+          <ProtectedRoute>
+            <FlashcardDetailPage />
           </ProtectedRoute>
         }
       />

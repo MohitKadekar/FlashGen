@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FileText, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { auth } from '../firebase';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import NoteCard from './NoteCard';
 import NoteDetailModal from './NoteDetailModal';
 
@@ -11,10 +11,22 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
     const [error, setError] = useState(null);
     const [selectedNote, setSelectedNote] = useState(null);
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     useEffect(() => {
         fetchNotes();
     }, [refreshTrigger]);
+
+    // Check for "open" query param after notes are loaded
+    useEffect(() => {
+        const noteIdToOpen = searchParams.get('open');
+        if (noteIdToOpen && notes.length > 0) {
+            const note = notes.find(n => n.id === parseInt(noteIdToOpen));
+            if (note) {
+                setSelectedNote(note);
+            }
+        }
+    }, [notes, searchParams]);
 
     const fetchNotes = async () => {
         try {
@@ -44,7 +56,16 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
         }
     };
 
-
+    const handleCloseModal = () => {
+        setSelectedNote(null);
+        // Optional: Clear the query param when closing
+        if (searchParams.get('open')) {
+            setSearchParams(params => {
+                params.delete('open');
+                return params;
+            });
+        }
+    };
 
     const displayedNotes = limit ? notes.slice(0, limit) : notes;
 
@@ -104,7 +125,7 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
             {selectedNote && (
                 <NoteDetailModal
                     note={selectedNote}
-                    onClose={() => setSelectedNote(null)}
+                    onClose={handleCloseModal}
                 />
             )}
         </div>
