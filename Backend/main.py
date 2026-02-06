@@ -57,6 +57,8 @@ def startup_event():
 
 # Include Routers
 app.include_router(notes.router, prefix="/api/notes", tags=["Notes"])
+from routers import flashcards
+app.include_router(flashcards.router, prefix="/api/flashcards", tags=["Flashcards"])
 
 
 # Root Endpoints

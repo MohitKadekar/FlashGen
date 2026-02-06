@@ -42,6 +42,10 @@ const Navbar = () => {
                 <LayoutDashboard className="w-4 h-4" />
                 Dashboard
               </Link>
+              <Link to="/flashcards" className="text-sm font-medium text-white/90 hover:text-white transition-colors flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Search
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-sm font-medium text-white/70 hover:text-white transition-colors flex items-center gap-2"

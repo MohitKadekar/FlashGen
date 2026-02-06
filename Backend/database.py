@@ -96,3 +96,23 @@ def get_flashcards_from_db(note_id: int, user_id: str):
         raise Exception(f"Database error: {e}")
     finally:
         if conn: conn.close()
+
+def search_flashcards_db(user_id: str, query: str):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        search_query = f"%{query}%"
+        cursor.execute("""
+            SELECT f.*, n.title as note_title 
+            FROM flashcards f
+            JOIN notes n ON f.note_id = n.id
+            WHERE f.user_id = ? AND (f.question LIKE ? OR f.answer LIKE ?)
+            ORDER BY f.created_at DESC
+        """, (user_id, search_query, search_query))
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()

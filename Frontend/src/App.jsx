@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import NotesPage from './pages/NotesPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import FlashcardsPage from './pages/FlashcardsPage';
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
         element={
           <ProtectedRoute>
             <NotesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/flashcards"
+        element={
+          <ProtectedRoute>
+            <FlashcardsPage />
           </ProtectedRoute>
         }
       />
