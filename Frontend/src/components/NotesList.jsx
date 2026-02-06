@@ -3,11 +3,13 @@ import { FileText, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 import { auth } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import NoteCard from './NoteCard';
+import NoteDetailModal from './NoteDetailModal';
 
 const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true }) => {
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedNote, setSelectedNote] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -85,7 +87,7 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
                         <NoteCard
                             key={note.id}
                             note={note}
-                            onClick={() => console.log('Navigate to note', note.id)}
+                            onClick={() => setSelectedNote(note)}
                         />
                     ))
                 )}
@@ -98,6 +100,13 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
                 Upload New Note
                 <ArrowRight className="w-4 h-4" />
             </button>
+
+            {selectedNote && (
+                <NoteDetailModal
+                    note={selectedNote}
+                    onClose={() => setSelectedNote(null)}
+                />
+            )}
         </div>
     );
 };
