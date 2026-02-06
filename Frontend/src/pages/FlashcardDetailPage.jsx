@@ -81,6 +81,26 @@ const FlashcardDetailPage = () => {
         }
     };
 
+    const handleDelete = async (flashcardId) => {
+        try {
+            const auth = getAuth();
+            const user = auth.currentUser;
+            const token = await user.getIdToken();
+
+            const response = await fetch(`http://localhost:8000/api/flashcards/${flashcardId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete flashcard');
+
+            navigate('/flashcards');
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete: " + err.message);
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-black text-white flex items-center justify-center">
@@ -140,6 +160,7 @@ const FlashcardDetailPage = () => {
                         <FlashcardDetail
                             flashcard={flashcard}
                             onEdit={() => setIsEditing(true)}
+                            onDelete={handleDelete}
                         />
                     </>
                 )}

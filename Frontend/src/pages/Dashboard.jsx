@@ -7,9 +7,13 @@ import FlashcardSets from '../components/FlashcardSets';
 import UploadNoteForm from '../components/UploadNoteForm';
 import FloatingLines from '../components/FloatingLines';
 
+import { useNavigate } from 'react-router-dom';
+import { BookOpen, Play } from 'lucide-react';
+
 const Dashboard = () => {
     const [isUploadOpen, setIsUploadOpen] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-black text-white selection:bg-indigo-500/30 relative overflow-hidden">
@@ -26,11 +30,20 @@ const Dashboard = () => {
             <Navbar />
 
             <div className="pt-32 pb-20 px-6 md:px-12 max-w-7xl mx-auto relative z-10">
-                <div className="mb-10">
-                    <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-indigo-200">
-                        Welcome back!
-                    </h1>
-                    <p className="text-gray-400 mt-2">Here's what's happening with your learning journey.</p>
+                <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white/80 to-indigo-200">
+                            Welcome back!
+                        </h1>
+                        <p className="text-gray-400 mt-2">Here's what's happening with your learning journey.</p>
+                    </div>
+                    <button
+                        onClick={() => navigate('/study/flip')}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-xl font-medium transition-all shadow-lg hover:shadow-indigo-500/25"
+                    >
+                        <Play className="w-5 h-5 fill-current" />
+                        Start Study Session
+                    </button>
                 </div>
 
                 <StatsOverview />

@@ -8,6 +8,7 @@ import NotesPage from './pages/NotesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import FlashcardsPage from './pages/FlashcardsPage';
 import FlashcardDetailPage from './pages/FlashcardDetailPage';
+import StudyFlipPage from './pages/StudyFlipPage';
 
 function App() {
   return (
@@ -44,6 +45,14 @@ function App() {
         element={
           <ProtectedRoute>
             <FlashcardDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/study/flip"
+        element={
+          <ProtectedRoute>
+            <StudyFlipPage />
           </ProtectedRoute>
         }
       />

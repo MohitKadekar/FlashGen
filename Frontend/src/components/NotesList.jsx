@@ -69,6 +69,31 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
 
     const displayedNotes = limit ? notes.slice(0, limit) : notes;
 
+    const handleDeleteNote = async (noteId) => {
+        try {
+            const token = await auth.currentUser.getIdToken();
+            const response = await fetch(`http://localhost:8000/api/notes/${noteId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete note');
+
+            setNotes(prev => prev.filter(n => n.id !== noteId));
+            setSelectedNote(null);
+            // Clear query param if open
+            if (searchParams.get('open') === String(noteId)) {
+                setSearchParams(params => {
+                    params.delete('open');
+                    return params;
+                });
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Failed to delete note: " + err.message);
+        }
+    };
+
     return (
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm h-full flex flex-col">
             <div className="flex items-center justify-between mb-6 shrink-0">
@@ -126,6 +151,7 @@ const NotesList = ({ onUploadClick, refreshTrigger, limit, showViewAll = true })
                 <NoteDetailModal
                     note={selectedNote}
                     onClose={handleCloseModal}
+                    onDelete={handleDeleteNote}
                 />
             )}
         </div>

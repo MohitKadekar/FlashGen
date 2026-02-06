@@ -45,6 +45,32 @@ async def get_flashcard_stats(user_id: str = Depends(verify_token)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+from database import get_due_flashcards_db, update_flashcard_review_db
+
+class FlashcardReview(BaseModel):
+    rating: int = Field(..., ge=0, le=5)
+
+@router.get("/due")
+async def get_due_flashcards(user_id: str = Depends(verify_token)):
+    try:
+        # Default scheduling logic handles picking due cards
+        flashcards = get_due_flashcards_db(user_id)
+        return {"success": True, "flashcards": flashcards}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/{flashcard_id}/review")
+async def review_flashcard(flashcard_id: int, review: FlashcardReview, user_id: str = Depends(verify_token)):
+    try:
+        updated_card = update_flashcard_review_db(user_id, flashcard_id, review.rating)
+        if not updated_card:
+             raise HTTPException(status_code=404, detail="Flashcard not found")
+        return {"success": True, "flashcard": updated_card}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/{flashcard_id}")
 async def get_flashcard(flashcard_id: int, user_id: str = Depends(verify_token)):
     try:
@@ -71,3 +97,18 @@ async def update_flashcard(flashcard_id: int, update_data: FlashcardUpdate, user
         raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+from database import delete_flashcard_db
+
+@router.delete("/{flashcard_id}")
+async def delete_flashcard(flashcard_id: int, user_id: str = Depends(verify_token)):
+    try:
+        success = delete_flashcard_db(user_id, flashcard_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Flashcard not found or permission denied")
+        return {"success": True, "message": "Flashcard deleted successfully"}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

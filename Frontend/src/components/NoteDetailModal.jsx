@@ -4,7 +4,7 @@ import { getAuth } from "firebase/auth";
 import GenerateCardsButton from './GenerateCardsButton';
 import FlashcardPreview from './FlashcardPreview';
 
-const NoteDetailModal = ({ note, onClose }) => {
+const NoteDetailModal = ({ note, onClose, onDelete }) => {
     const [flashcards, setFlashcards] = useState([]);
     const [loadingCards, setLoadingCards] = useState(false);
 
@@ -50,12 +50,24 @@ const NoteDetailModal = ({ note, onClose }) => {
                         </div>
                         <h2 className="text-xl font-bold text-white truncate max-w-md">{note.title || 'Untitled Note'}</h2>
                     </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-gray-700/50 rounded-lg text-gray-400 hover:text-white transition-colors"
-                    >
-                        <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => {
+                                if (window.confirm("Are you sure you want to delete this note?")) {
+                                    onDelete(note.id);
+                                }
+                            }}
+                            className="px-3 py-1.5 bg-red-900/20 hover:bg-red-900/40 text-red-500 hover:text-red-400 text-sm font-medium rounded-lg border border-red-900/50 hover:border-red-800 transition-colors"
+                        >
+                            Delete Note
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="p-2 hover:bg-gray-700/50 rounded-lg text-gray-400 hover:text-white transition-colors"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}

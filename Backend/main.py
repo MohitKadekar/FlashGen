@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import firebase_admin
-from database import init_db
+from database import init_db, ensure_schema_updates
 from routers import notes
 import google.generativeai as genai
 
@@ -54,6 +54,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     init_db()
+    ensure_schema_updates()
 
 # Include Routers
 app.include_router(notes.router, prefix="/api/notes", tags=["Notes"])

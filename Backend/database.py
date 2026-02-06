@@ -212,3 +212,138 @@ def get_flashcard_stats_db(user_id: str):
         raise Exception(f"Database error: {e}")
     finally:
         if conn: conn.close()
+
+def ensure_schema_updates():
+    """Ensures that the flashcards table has the necessary columns for spaced repetition."""
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        
+        # Check existing columns
+        cursor.execute("PRAGMA table_info(flashcards)")
+        columns = [info[1] for info in cursor.fetchall()]
+        
+        # Add columns if they don't exist
+        if 'next_review_date' not in columns:
+            cursor.execute("ALTER TABLE flashcards ADD COLUMN next_review_date DATE")
+        if 'interval' not in columns:
+            cursor.execute("ALTER TABLE flashcards ADD COLUMN interval INTEGER DEFAULT 0")
+        if 'repetition_count' not in columns:
+            cursor.execute("ALTER TABLE flashcards ADD COLUMN repetition_count INTEGER DEFAULT 0")
+        if 'ease_factor' not in columns:
+            cursor.execute("ALTER TABLE flashcards ADD COLUMN ease_factor REAL DEFAULT 2.5")
+            
+        conn.commit()
+    except Exception as e:
+        print(f"Schema Update Error: {e}")
+    finally:
+        if conn: conn.close()
+
+def get_due_flashcards_db(user_id: str):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Fetch cards where next_review_date is NULL (new) OR <= today
+        # AND user_id matches
+        # We limit to 50 to avoid overwhelming the user
+        cursor.execute("""
+            SELECT * FROM flashcards 
+            WHERE user_id = ? 
+            AND (next_review_date IS NULL OR next_review_date <= date('now'))
+            ORDER BY next_review_date ASC
+            LIMIT 50
+        """, (user_id,))
+        
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()
+
+def update_flashcard_review_db(user_id: str, flashcard_id: int, rating: int):
+    """
+    Updates the flashcard's scheduling based on the review rating (0-5).
+    This is a simplified version of SM-2 for now, as requested.
+    """
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Get current state
+        cursor.execute("SELECT * FROM flashcards WHERE id = ? AND user_id = ?", (flashcard_id, user_id))
+        row = cursor.fetchone()
+        
+        if not row:
+            return None # Not found or not owned
+            
+        card = dict(row)
+        
+        # Basic scheduling logic (Placeholder for full SM-2)
+        # 0-3: Hard/Fail -> Reset interval or keep short
+        # 4-5: Good/Easy -> Increase interval
+        
+        current_interval = card.get('interval') or 0
+        current_reps = card.get('repetition_count') or 0
+        
+        if rating >= 4:
+            new_interval = 1 if current_interval == 0 else (current_interval * 2)
+            new_reps = current_reps + 1
+        elif rating >= 2:
+             new_interval = 1 # Review tomorrow
+             new_reps = current_reps 
+        else:
+            new_interval = 0 # Review today/again
+            new_reps = 0
+            
+        # Calculate next review date
+        cursor.execute("SELECT date('now', ?)", (f"+{new_interval} days",))
+        next_date = cursor.fetchone()[0]
+        
+        cursor.execute("""
+            UPDATE flashcards 
+            SET next_review_date = ?, interval = ?, repetition_count = ?
+            WHERE id = ?
+        """, (next_date, new_interval, new_reps, flashcard_id))
+        
+        conn.commit()
+        
+        # Return updated card
+        cursor.execute("SELECT * FROM flashcards WHERE id = ?", (flashcard_id,))
+        updated_row = cursor.fetchone()
+        return dict(updated_row)
+        
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()
+
+def delete_flashcard_db(user_id: str, flashcard_id: int):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM flashcards WHERE id = ? AND user_id = ?", (flashcard_id, user_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()
+
+def delete_note_db(user_id: str, note_id: int):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        cursor = conn.cursor()
+        # Delete associated flashcards first
+        cursor.execute("DELETE FROM flashcards WHERE note_id = ? AND user_id = ?", (note_id, user_id))
+        # Delete the note
+        cursor.execute("DELETE FROM notes WHERE id = ? AND user_id = ?", (note_id, user_id))
+        conn.commit()
+        return cursor.rowcount > 0
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()

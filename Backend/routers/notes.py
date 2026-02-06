@@ -102,3 +102,18 @@ async def get_flashcards(note_id: int, user_id: str = Depends(verify_token)):
         return {"success": True, "flashcards": flashcards}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+from database import delete_note_db
+
+@router.delete("/{note_id}")
+async def delete_note(note_id: int, user_id: str = Depends(verify_token)):
+    try:
+        success = delete_note_db(user_id, note_id)
+        if not success:
+            raise HTTPException(status_code=404, detail="Note not found or permission denied")
+        return {"success": True, "message": "Note deleted successfully"}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
