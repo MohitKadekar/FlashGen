@@ -1,4 +1,5 @@
 import sqlite3
+from utils import calculate_sm2
 
 DB_NAME = "notes.db"
 
@@ -265,8 +266,14 @@ def get_due_flashcards_db(user_id: str):
 
 def update_flashcard_review_db(user_id: str, flashcard_id: int, rating: int):
     """
-    Updates the flashcard's scheduling based on the review rating (0-5).
-    This is a simplified version of SM-2 for now, as requested.
+    Updates the flashcard's scheduling using the SM-2 spaced repetition algorithm.
+    Algorithm details:
+    1. Interval(1) = 1
+    2. Interval(2) = 6
+    3. Interval(n) = Interval(n-1) * EaseFactor
+    4. NewEaseFactor = OldEaseFactor + (0.1 - (5 - rating) * (0.08 + (5 - rating) * 0.02))
+    5. EaseFactor must be >= 1.3
+    6. If rating < 3, RepetitionCount is reset to 0, Interval is reset to 1
     """
     try:
         conn = sqlite3.connect(DB_NAME)
@@ -282,32 +289,32 @@ def update_flashcard_review_db(user_id: str, flashcard_id: int, rating: int):
             
         card = dict(row)
         
-        # Basic scheduling logic (Placeholder for full SM-2)
-        # 0-3: Hard/Fail -> Reset interval or keep short
-        # 4-5: Good/Easy -> Increase interval
+        # Current state values
+        # Default interval to 0 if null, but SM-2 usually starts with Logic
+        prev_interval = card.get('interval', 0) or 0
+        prev_reps = card.get('repetition_count', 0) or 0
+        prev_ease = card.get('ease_factor', 2.5) or 2.5
         
-        current_interval = card.get('interval') or 0
-        current_reps = card.get('repetition_count') or 0
+        # Calculate new scheduling using SM-2 helper
+        sm2_result = calculate_sm2(
+            quality=rating,
+            repetition_count=prev_reps,
+            ease_factor=prev_ease,
+            current_interval=prev_interval
+        )
         
-        if rating >= 4:
-            new_interval = 1 if current_interval == 0 else (current_interval * 2)
-            new_reps = current_reps + 1
-        elif rating >= 2:
-             new_interval = 1 # Review tomorrow
-             new_reps = current_reps 
-        else:
-            new_interval = 0 # Review today/again
-            new_reps = 0
-            
-        # Calculate next review date
-        cursor.execute("SELECT date('now', ?)", (f"+{new_interval} days",))
-        next_date = cursor.fetchone()[0]
+        new_interval = sm2_result['interval']
+        new_reps = sm2_result['repetition_count']
+        new_ease = sm2_result['ease_factor']
+        next_date = sm2_result['next_review_date'].isoformat()
+
+
         
         cursor.execute("""
             UPDATE flashcards 
-            SET next_review_date = ?, interval = ?, repetition_count = ?
+            SET next_review_date = ?, interval = ?, repetition_count = ?, ease_factor = ?
             WHERE id = ?
-        """, (next_date, new_interval, new_reps, flashcard_id))
+        """, (next_date, new_interval, new_reps, new_ease, flashcard_id))
         
         conn.commit()
         
