@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import FloatingLines from '../components/FloatingLines';
 import SearchBar from '../components/SearchBar';
 import FlashcardList from '../components/FlashcardList';
+import ExportButton from '../components/ExportButton';
 
 const FlashcardsPage = () => {
     const [flashcards, setFlashcards] = useState([]);
@@ -65,7 +66,10 @@ const FlashcardsPage = () => {
                     </p>
                 </div>
 
-                <SearchBar onSearch={handleSearch} />
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+                    <SearchBar onSearch={handleSearch} />
+                    <ExportButton />
+                </div>
 
                 <FlashcardList
                     flashcards={flashcards}

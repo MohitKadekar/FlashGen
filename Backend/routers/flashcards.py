@@ -139,3 +139,48 @@ async def get_flashcard_distractors(flashcard_id: int, user_id: str = Depends(ve
     except Exception as e:
         print(f"Distractor fetch failed: {e}")
         return {"success": True, "distractors": ["Option A", "Option B", "Option C"]}
+
+from database import export_flashcards_db
+from fastapi.responses import StreamingResponse
+import csv
+import io
+
+@router.get("/data/export")
+async def export_flashcards(format: str = 'csv', user_id: str = Depends(verify_token)):
+    try:
+        flashcards = export_flashcards_db(user_id)
+        
+        if format.lower() == 'csv':
+            # Create CSV in memory
+            stream = io.StringIO()
+            csv_writer = csv.writer(stream)
+            
+            # Header
+            csv_writer.writerow(['Question', 'Answer', 'Difficulty', 'Next Review', 'Interval', 'Reps', 'Ease Factor'])
+            
+            # Data
+            for card in flashcards:
+                csv_writer.writerow([
+                    card['question'], 
+                    card['answer'], 
+                    card.get('difficulty', ''),
+                    card.get('next_review_date', ''),
+                    card.get('interval', 0),
+                    card.get('repetition_count', 0),
+                    card.get('ease_factor', 2.5)
+                ])
+            
+            # Move to start
+            stream.seek(0)
+            
+            response = StreamingResponse(iter([stream.getvalue()]), media_type="text/csv")
+            response.headers["Content-Disposition"] = "attachment; filename=my_flashcards.csv"
+            return response
+            
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported format. Only 'csv' is currently supported.")
+            
+    except Exception as e:
+        print(f"Export failed detailed: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+

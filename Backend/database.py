@@ -429,3 +429,20 @@ def get_detailed_stats_db(user_id: str):
         raise Exception(f"Database error: {e}")
     finally:
         if conn: conn.close()
+
+def export_flashcards_db(user_id: str):
+    """
+    Fetches all flashcards for a user to be exported.
+    """
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        cursor.execute("SELECT * FROM flashcards WHERE user_id = ?", (user_id,))
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()
