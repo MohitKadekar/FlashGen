@@ -377,3 +377,55 @@ def get_random_distractors_db(user_id: str, flashcard_id: int):
         return []
     finally:
         if conn: conn.close()
+
+def get_detailed_stats_db(user_id: str):
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Total cards
+        cursor.execute("SELECT COUNT(*) FROM flashcards WHERE user_id = ?", (user_id,))
+        total_cards = cursor.fetchone()[0]
+        
+        # New cards (reps = 0)
+        cursor.execute("SELECT COUNT(*) FROM flashcards WHERE user_id = ? AND repetition_count = 0", (user_id,))
+        new_cards = cursor.fetchone()[0]
+        
+        # Mastered cards (Mature: interval > 21 days)
+        cursor.execute("SELECT COUNT(*) FROM flashcards WHERE user_id = ? AND interval > 21", (user_id,))
+        mastered_cards = cursor.fetchone()[0]
+        
+        # Learning/Young cards (reps > 0 but interval <= 21)
+        learning_cards = total_cards - new_cards - mastered_cards
+        
+        # Retention Rate (Global average of correct answers vs attempts? 
+        # We don't have separate review history table yet. 
+        # Let's approximate by (Total - Lapsed) / Total or just use Ease Factor avg?)
+        # Let's use Average Ease Factor for now as a proxy for retention "quality".
+        # 2.5 is default. Higher means easier/better retention.
+        
+        cursor.execute("SELECT AVG(ease_factor) FROM flashcards WHERE user_id = ? AND repetition_count > 0", (user_id,))
+        avg_ease = cursor.fetchone()[0]
+        
+        retention_rate = 0
+        if avg_ease:
+             # Normalize 1.3 (hardest) to 3.0+ (easy) -> scale to percentage
+             # (AvgEase - 1.3) / (3.0 - 1.3) approx?
+             # Let's just return raw stats for now and calculate friendly % in frontend or here.
+             # Actually, let's look at recent performance if we had history.
+             # Without history table, we can only show state snapshots.
+             pass
+        
+        return {
+            "total_cards": total_cards,
+            "new_cards": new_cards,
+            "learning_cards": learning_cards,
+            "mastered_cards": mastered_cards,
+            "avg_ease": avg_ease or 2.5
+        }
+            
+    except Exception as e:
+        raise Exception(f"Database error: {e}")
+    finally:
+        if conn: conn.close()

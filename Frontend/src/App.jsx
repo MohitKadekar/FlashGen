@@ -11,6 +11,7 @@ import FlashcardDetailPage from './pages/FlashcardDetailPage';
 import StudyFlipPage from './pages/StudyFlipPage';
 import StudyMultipleChoice from './pages/StudyMultipleChoice';
 import StudyTyping from './pages/StudyTyping';
+import StatsPage from './pages/StatsPage';
 
 function App() {
   return (
@@ -71,6 +72,14 @@ function App() {
         element={
           <ProtectedRoute>
             <StudyTyping />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/stats"
+        element={
+          <ProtectedRoute>
+            <StatsPage />
           </ProtectedRoute>
         }
       />

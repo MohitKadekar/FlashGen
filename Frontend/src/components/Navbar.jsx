@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { BookOpen, LogOut, LayoutDashboard } from 'lucide-react';
+import { BookOpen, LogOut, LayoutDashboard, Activity } from 'lucide-react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -44,7 +44,11 @@ const Navbar = () => {
               </Link>
               <Link to="/flashcards" className="text-sm font-medium text-white/90 hover:text-white transition-colors flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
-                Search
+                Cards
+              </Link>
+              <Link to="/stats" className="text-sm font-medium text-white/90 hover:text-white transition-colors flex items-center gap-2">
+                <Activity className="w-4 h-4" />
+                Stats
               </Link>
               <button
                 onClick={handleLogout}

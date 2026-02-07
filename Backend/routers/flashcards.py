@@ -37,15 +37,16 @@ async def get_recent_flashcards(limit: int = 5, user_id: str = Depends(verify_to
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-from database import get_flashcard_stats_db
-
+from database import get_detailed_stats_db
+ 
 @router.get("/stats")
 async def get_flashcard_stats(user_id: str = Depends(verify_token)):
     try:
-        stats = get_flashcard_stats_db(user_id)
+        stats = get_detailed_stats_db(user_id)
         return {"success": True, "stats": stats}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 from database import get_due_flashcards_db, update_flashcard_review_db
 
