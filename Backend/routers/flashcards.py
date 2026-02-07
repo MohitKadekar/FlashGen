@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import List, Optional
-from database import search_flashcards_db, get_flashcard_sets_from_db, get_recent_flashcards_db, get_flashcard_by_id_db, update_flashcard_to_db
+from database import search_flashcards_db, get_flashcard_sets_from_db, get_recent_flashcards_db, get_flashcard_by_id_db, update_flashcard_to_db, get_random_distractors_db
 from dependencies import verify_token
 from pydantic import BaseModel, Field
+from llm_utils import generate_distractors
+import random
 
 router = APIRouter()
 
@@ -112,3 +114,27 @@ async def delete_flashcard(flashcard_id: int, user_id: str = Depends(verify_toke
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@router.get("/{flashcard_id}/distractors")
+async def get_flashcard_distractors(flashcard_id: int, user_id: str = Depends(verify_token)):
+    """
+    Fetches 3 random answers from other flashcards to use as distractors.
+    This replaces the expensive LLM call with a database query.
+    """
+    try:
+        # Verify card exists and belongs to user
+        flashcard = get_flashcard_by_id_db(user_id, flashcard_id)
+        if not flashcard:
+             raise HTTPException(status_code=404, detail="Flashcard not found")
+        
+        # Get random distractors from DB
+        distractors = get_random_distractors_db(user_id, flashcard_id)
+        
+        # If we don't have enough cards/distractors (e.g. only 1 card exists), fallback to generic
+        while len(distractors) < 3:
+            distractors.append(f"Option {chr(65+len(distractors))}") # Option A, Option B...
+            
+        return {"success": True, "distractors": distractors}
+    except Exception as e:
+        print(f"Distractor fetch failed: {e}")
+        return {"success": True, "distractors": ["Option A", "Option B", "Option C"]}

@@ -354,3 +354,26 @@ def delete_note_db(user_id: str, note_id: int):
         raise Exception(f"Database error: {e}")
     finally:
         if conn: conn.close()
+
+def get_random_distractors_db(user_id: str, flashcard_id: int):
+    """Fetches random answers from other flashcards to use as distractors."""
+    try:
+        conn = sqlite3.connect(DB_NAME)
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        
+        # Get 3 random answers from other cards
+        cursor.execute("""
+            SELECT answer FROM flashcards 
+            WHERE user_id = ? AND id != ?
+            ORDER BY RANDOM() 
+            LIMIT 3
+        """, (user_id, flashcard_id))
+        
+        rows = cursor.fetchall()
+        return [row['answer'] for row in rows]
+    except Exception as e:
+        print(f"Error fetching random distractors: {e}")
+        return []
+    finally:
+        if conn: conn.close()

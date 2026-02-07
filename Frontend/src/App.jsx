@@ -9,6 +9,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import FlashcardsPage from './pages/FlashcardsPage';
 import FlashcardDetailPage from './pages/FlashcardDetailPage';
 import StudyFlipPage from './pages/StudyFlipPage';
+import StudyMultipleChoice from './pages/StudyMultipleChoice';
+import StudyTyping from './pages/StudyTyping';
 
 function App() {
   return (
@@ -53,6 +55,22 @@ function App() {
         element={
           <ProtectedRoute>
             <StudyFlipPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/study/multiple-choice"
+        element={
+          <ProtectedRoute>
+            <StudyMultipleChoice />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/study/typing"
+        element={
+          <ProtectedRoute>
+            <StudyTyping />
           </ProtectedRoute>
         }
       />
