@@ -127,6 +127,7 @@ The project is broken down into 19 issues, progressing from foundation to advanc
 
 ### Final (Issue 19)
 19. **Final Testing** - Complete application flow verification
+    - [Testing Documentation](./PROJECT-README.md)
 
 ---
 
