@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Using models/gemini-1.5-flash for speed and cost effectiveness (Free tier eligible)
-llm = ChatGoogleGenerativeAI(model="models/gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
+llm = ChatGoogleGenerativeAI(model="models/gemini-flash-lite-latest", google_api_key=os.getenv("GOOGLE_API_KEY"))
 
 def generate_distractors(question: str, answer: str):
     """
