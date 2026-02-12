@@ -1,0 +1,17 @@
+.venv
+__pycache__
+*.pyc
+*.db
+notes.db
+flashcards.db
+uv.lock
+test_*.py
+tests/
+models_output.txt
+test_results.txt
+check_models.py
+README.md
+.env
+.gitignore
+.python-version
+pyproject.toml

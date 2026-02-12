@@ -8,3 +8,4 @@ langchain
 langchain-google-genai
 langchain-community
 psycopg2-binary
+gunicorn

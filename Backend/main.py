@@ -22,8 +22,7 @@ try:
     if not firebase_admin._apps:
         project_id = os.getenv("FIREBASE_PROJECT_ID")
         
-        # Use a dummy credential to bypass ADC requirement for local dev
-        # This allows verify_id_token to work (fetching public keys) without a service account
+        # Use a dummy credential to bypass ADC requirement for local dev and cloud run
         import google.auth.credentials
         class NoOpCredentials(google.auth.credentials.Credentials):
             def refresh(self, request):
