@@ -71,7 +71,7 @@ async def generate_flashcards(note_id: int, count: int = 5, user_id: str = Depen
         if not api_key:
              raise HTTPException(status_code=500, detail="Google API Key not configured")
 
-        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=api_key, temperature=0.7)
+        llm = ChatGoogleGenerativeAI(model="models/gemini-flash-lite-latest", google_api_key=api_key, temperature=0.7)
         parser = PydanticOutputParser(pydantic_object=FlashcardList)
 
         prompt = PromptTemplate(

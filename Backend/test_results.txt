@@ -1,0 +1,5 @@
+Testing models/gemini-1.5-flash... FAILED: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Testing models/gemini-1.5-flash-001... FAILED: 404 models/gemini-1.5-flash-001 is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Testing models/gemini-1.5-flash-002... FAILED: 404 models/gemini-1.5-flash-002 is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Testing models/gemini-1.5-flash-8b... FAILED: 404 models/gemini-1.5-flash-8b is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+Testing models/gemini-flash-lite-latest... SUCCESS
